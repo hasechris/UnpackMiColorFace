@@ -24,7 +24,7 @@ namespace UnpackMiColorFace.Decompiler
         public void Process(WatchType watchType, byte[] data)
         {
             var dir = Directory.CreateDirectory(filenameHelper.NameNoExt);
-            var path = dir.FullName + "\\";
+            var path = dir.FullName + Path.DirectorySeparatorChar;
 
             if (File.Exists(path + "source.bin"))
                 File.Delete(path + "source.bin");
@@ -53,7 +53,7 @@ namespace UnpackMiColorFace.Decompiler
                 else
                     dir = Directory.CreateDirectory(imagesFolder);
 
-                var pathImages = dir.FullName + "\\";                
+                var pathImages = dir.FullName + Path.DirectorySeparatorChar;
 
                 List<FaceElement> lste = null;
                 List<FaceWidget> lstw = null;
@@ -243,7 +243,7 @@ namespace UnpackMiColorFace.Decompiler
 
             string bmpFile = path + "preview.bmp";
             string pngFile = path + "preview.png";
-            string pngFileCopy = path + "images\\preview.png";
+            string pngFileCopy = Path.Combine(path, "images", "preview.png");
 
             if (File.Exists(pngFile))
                 File.Delete(pngFile);
@@ -272,7 +272,7 @@ namespace UnpackMiColorFace.Decompiler
 
         private List<FaceAppItem> ProcessAppData(WatchType watchType, byte[] data, uint offset)
         {
-            string path = filenameHelper.NameNoExt + @"\app\";
+            string path = Path.Combine(filenameHelper.NameNoExt, "app") + Path.DirectorySeparatorChar;
 
             uint blockCount = data.GetDWord(offset);
             uint blockOffset = data.GetDWord(offset + 4);
@@ -302,7 +302,7 @@ namespace UnpackMiColorFace.Decompiler
 
                 string filename = Encoding.ASCII.GetString(bin.GetByteArray(0x14, filenameLen));
 
-                string appFile = path + filename;
+                string appFile = Path.Combine(path, filename);
 
                 DirectoryInfo dir;
 
@@ -332,7 +332,7 @@ namespace UnpackMiColorFace.Decompiler
             int displayWidth = WatchScreen.GetScreenWidth(watchType);
             int displayHeight = WatchScreen.GetScreenHeight(watchType);
 
-            using (var preview = new MagickImage(MagickColor.FromRgb(0, 0, 0), displayWidth, displayHeight))
+            using (var preview = new MagickImage(MagickColors.Black, (uint)displayWidth, (uint)displayHeight))
             {
                 //preview.BackgroundColor = MagickColor.FromRgb(0, 0, 0);
                 //preview.FloodFill(MagickColor.FromRgb(0, 0, 0), 0, 0);
@@ -342,7 +342,7 @@ namespace UnpackMiColorFace.Decompiler
                     {
                         case 30: // image
                             var widgetImage = widget as FaceWidgetImage;
-                            string pathImage = $"{imagesFolder}\\{widgetImage.Bitmap}";
+                            string pathImage = Path.Combine(imagesFolder, widgetImage.Bitmap);
                             using (var overlay = new MagickImage())
                             {
                                 overlay.Read(pathImage);
@@ -353,7 +353,7 @@ namespace UnpackMiColorFace.Decompiler
                             var widgetCirc = widget as FaceWidgetCircularGauge;
                             if (!string.IsNullOrEmpty(widgetCirc.PointerImage))
                             {
-                                string pathCirc = $"{imagesFolder}\\{widgetCirc.PointerImage}";
+                                string pathCirc = Path.Combine(imagesFolder, widgetCirc.PointerImage);
                                 ApplyCircleImage(preview, widgetCirc, pathCirc, 150);
                             }
                             break;
@@ -365,7 +365,7 @@ namespace UnpackMiColorFace.Decompiler
                             if (digitInt > imgList.Length)
                                 digitInt = 1;
                             var pathFirst = imgList[digitInt].Split(':')[1];
-                            string pathList = $"{imagesFolder}\\{pathFirst}";
+                            string pathList = Path.Combine(imagesFolder, pathFirst);
                             using (var overlay = new MagickImage())
                             {
                                 overlay.Read(pathList);
@@ -404,7 +404,7 @@ namespace UnpackMiColorFace.Decompiler
 
                                 for (int i = 0; i < maxLen; i++)
                                 {
-                                    string pathNum = $"{imagesFolder}\\{bitmaps[int.Parse(digit[i].ToString())]}";
+                                    string pathNum = Path.Combine(imagesFolder, bitmaps[int.Parse(digit[i].ToString())]);
                                     overlay.Read(pathNum);
                                     preview.Composite(overlay, posX, posY, CompositeOperator.Over);
                                     posX += width + spacing;
@@ -415,17 +415,17 @@ namespace UnpackMiColorFace.Decompiler
                             var clock = widget as FaceWidgetAnalogClock;
                             if (!string.IsNullOrEmpty(clock.HourHandImage))
                             {
-                                string pathHand = $"{imagesFolder}\\{clock.HourHandImage}";
+                                string pathHand = Path.Combine(imagesFolder, clock.HourHandImage);
                                 ApplyClockImage(preview, clock, clock.HourImageRotateX, clock.HourImageRotateY, pathHand, -60);
                             }
                             if (!string.IsNullOrEmpty(clock.MinuteHandImage))
                             {
-                                string pathHand = $"{imagesFolder}\\{clock.MinuteHandImage}";
+                                string pathHand = Path.Combine(imagesFolder, clock.MinuteHandImage);
                                 ApplyClockImage(preview, clock, clock.MinuteImageRotateX, clock.MinuteImageRotateY, pathHand, 50);
                             }
                             if (!string.IsNullOrEmpty(clock.SecondHandImage))
                             {
-                                string pathHand = $"{imagesFolder}\\{clock.SecondHandImage}";
+                                string pathHand = Path.Combine(imagesFolder, clock.SecondHandImage);
                                 ApplyClockImage(preview, clock, clock.SecondImageRotateX, clock.SecondImageRotateY, pathHand, 120);
                             }
                             break;
@@ -460,7 +460,7 @@ namespace UnpackMiColorFace.Decompiler
 
         private void ApplyCircleImage(MagickImage preview, FaceWidgetCircularGauge gauge, string pathImage, int angle)
         {
-            using (var overlay = new MagickImage(MagickColor.FromRgba(0, 0, 0, 0), gauge.Width, gauge.Height))
+            using (var overlay = new MagickImage(MagickColors.Transparent, (uint)gauge.Width, (uint)gauge.Height))
             {
                 int posX = ((gauge.Width - gauge.X) / 2) - gauge.PointerRotateX;
                 int posY = ((gauge.Height - gauge.Y) / 2) - gauge.PointerRotateY;
@@ -509,7 +509,7 @@ namespace UnpackMiColorFace.Decompiler
 
         private void ApplyClockImage(MagickImage preview, FaceWidgetAnalogClock clock, int rotateX, int rotateY, string pathImage, int angle)
         {
-            using (var overlay = new MagickImage(MagickColor.FromRgba(0, 0, 0, 0), clock.Width, clock.Height))
+            using (var overlay = new MagickImage(MagickColors.Transparent, (uint)clock.Width, (uint)clock.Height))
             {
                 int posX = ((clock.Width - clock.X) / 2) - rotateX;
                 int posY = ((clock.Height - clock.Y) / 2) - rotateY;

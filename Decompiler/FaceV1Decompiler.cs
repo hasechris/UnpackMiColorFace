@@ -23,10 +23,10 @@ namespace UnpackMiColorFace.Decompiler
         public void Process(WatchType watchType, byte[] data)
         {
             var dir = Directory.CreateDirectory(filenameHelper.NameNoExt);
-            var path = dir.FullName + "\\";
+            var path = dir.FullName + Path.DirectorySeparatorChar;
 
-            dir = Directory.CreateDirectory(filenameHelper.NameNoExt + "\\images");
-            var pathImages = dir.FullName + "\\";
+            dir = Directory.CreateDirectory(Path.Combine(filenameHelper.NameNoExt, "images"));
+            var pathImages = dir.FullName + Path.DirectorySeparatorChar;
 
             uint offset = 0x14A;
             uint blockCount = data.GetDWord(offset);

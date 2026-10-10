@@ -26,8 +26,8 @@ namespace UnpackMiColorFace.Decompiler
                 return;
 
             var dir = Directory.CreateDirectory(filenameHelper.NameNoExt);
-            var path = dir.FullName + "\\";
-            var pathImages = dir.FullName + "\\images";
+            var path = dir.FullName + Path.DirectorySeparatorChar;
+            var pathImages = Path.Combine(dir.FullName, "images");
 
             uint offsetPreview = 0x59;
 
@@ -121,7 +121,7 @@ namespace UnpackMiColorFace.Decompiler
 
                 string bmpFile = $"{path}{filenames[i]}.bmp";
                 string pngFile = $"{path}{filenames[i]}.png";
-                string pngFileCopy = $"{path}images\\{filenames[i]}.png";
+                string pngFileCopy = Path.Combine(path, "images", $"{filenames[i]}.png");
 
                 if (File.Exists(pngFile))
                     File.Delete(pngFile);
@@ -198,8 +198,8 @@ namespace UnpackMiColorFace.Decompiler
 
                         var bitmap = BmpHelper.ConvertToBmpGTR(dec, width, height, 2);
 
-                        string bmpFile = $"{path}\\image_{sectionId:D2}_{i:D4}.bmp";
-                        string pngFile = $"{path}\\image_{sectionId:D2}_{i:D4}.png";
+                        string bmpFile = Path.Combine(path, $"image_{sectionId:D2}_{i:D4}.bmp");
+                        string pngFile = Path.Combine(path, $"image_{sectionId:D2}_{i:D4}.png");
 
                         imageNameList.Add($"{Path.GetFileName(pngFile)}");
 
@@ -250,15 +250,15 @@ namespace UnpackMiColorFace.Decompiler
                         bin.SetByteArray(pos, pixelData);
                         byte[] dec = decompressor.Decompress(bin, width, height, (uint)(dataLen << 8 | (byte)type));
 
-                        //string binFile = $"{path}\\image_{sectionId:D2}_{i:D4}.bin";
+                        //string binFile = Path.Combine(path, $"image_{sectionId:D2}_{i:D4}.bin");
                         //File.WriteAllBytes(binFile, dec);
 
                         byte[] decBin = dec.Rgb565AlphaToRGBA();
 
                         var bitmap = BmpHelper.ConvertToBmpGTR(decBin, width, height, 4);
 
-                        string bmpFile = $"{path}\\image_{sectionId:D2}_{i:D4}.bmp";
-                        string pngFile = $"{path}\\image_{sectionId:D2}_{i:D4}.png";
+                        string bmpFile = Path.Combine(path, $"image_{sectionId:D2}_{i:D4}.bmp");
+                        string pngFile = Path.Combine(path, $"image_{sectionId:D2}_{i:D4}.png");
 
                         imageNameList.Add($"{Path.GetFileName(pngFile)}");
 
@@ -312,15 +312,15 @@ namespace UnpackMiColorFace.Decompiler
                         byte[] dec = decompressor.Decompress(bin, width, height, (uint)(dataLen << 8 | (byte)type));
 
                         // concat color and alpha channel from decompressed data
-                        dec = dec.Select(i => (uint)(color >> 8 | i << 24)).SelectMany(BitConverter.GetBytes).ToArray();
+                        dec = dec.Select(i => (color >> 8) | ((uint)i << 24)).SelectMany(BitConverter.GetBytes).ToArray();
 
-                        //string binFile = $"{path}\\image_{sectionId:D2}_{i:D4}.bin";
+                        //string binFile = Path.Combine(path, $"image_{sectionId:D2}_{i:D4}.bin");
                         //File.WriteAllBytes(binFile, dec);
 
                         var bitmap = BmpHelper.ConvertToBmpGTR(dec, width, height, 4);
 
-                        string bmpFile = $"{path}\\image_{sectionId:D2}_{i:D4}.bmp";
-                        string pngFile = $"{path}\\image_{sectionId:D2}_{i:D4}.png";
+                        string bmpFile = Path.Combine(path, $"image_{sectionId:D2}_{i:D4}.bmp");
+                        string pngFile = Path.Combine(path, $"image_{sectionId:D2}_{i:D4}.png");
 
                         imageNameList.Add($"{Path.GetFileName(pngFile)}");
 

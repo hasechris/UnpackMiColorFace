@@ -26,3 +26,25 @@ Watchfaces unpacker utility for Xiaomi watches:
 - Xioami Mi Band 9
 - Xioami Mi Band 9 Pro (in release soon)
 - Xiaomi Redmi Watch 5 (in release soon)
+
+## Build on Linux with VS Code
+
+Install the .NET 10 SDK and the recommended VS Code extension. On Manjaro, the SDK can be installed with:
+
+```sh
+sudo pacman -S dotnet-sdk
+```
+
+Open this repository folder in VS Code, then build with **Terminal > Run Build Task** or:
+
+```sh
+dotnet build UnpackMiColorFace.csproj
+```
+
+Run the unpacker with:
+
+```sh
+dotnet run --project UnpackMiColorFace.csproj -- /path/to/watchface.bin
+```
+
+The build restores Magick.NET from NuGet. `XiaomiWatch.Common.dll` is referenced from the repository's `lib` directory and copied to the build output.

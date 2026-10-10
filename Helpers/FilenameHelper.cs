@@ -17,11 +17,16 @@ namespace UnpackMiColorFace.Helpers
 
         public string GetFaceSlotImagesFolder(WatchType watchType, int slotId, int subversion) => watchType switch
         {
-            WatchType.Gen3 => NameNoExt + @"\images",
-            WatchType.MiWatchS3 => NameNoExt + @"\images",
-            WatchType.MiBand9 => NameNoExt + @"\images",
-            WatchType.MiBand8Pro => NameNoExt + @"\images",
-            _ => (slotId == 0 ? NameNoExt + @"\images" : ((slotId == 1) ? NameNoExt + @"\AOD\images" : NameNoExt + $@"\images_{slotId}") )
+            WatchType.Gen3 => Path.Combine(NameNoExt, "images"),
+            WatchType.MiWatchS3 => Path.Combine(NameNoExt, "images"),
+            WatchType.MiBand9 => Path.Combine(NameNoExt, "images"),
+            WatchType.MiBand8Pro => Path.Combine(NameNoExt, "images"),
+            _ => slotId switch
+            {
+                0 => Path.Combine(NameNoExt, "images"),
+                1 => Path.Combine(NameNoExt, "AOD", "images"),
+                _ => Path.Combine(NameNoExt, $"images_{slotId}")
+            }
         };
 
         internal string GetFaceSlotFilename(WatchType watchType, int slotId, int subversion)
@@ -38,7 +43,7 @@ namespace UnpackMiColorFace.Helpers
             }
             else
             {
-                if (slotId == 1) facefile = "AOD\\" + NameNoExt;
+                if (slotId == 1) facefile = Path.Combine("AOD", NameNoExt);
             }
 
             return facefile;
