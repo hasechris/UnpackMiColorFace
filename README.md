@@ -45,6 +45,10 @@ Run the unpacker with:
 
 ```sh
 dotnet run --project UnpackMiColorFace.csproj -- /path/to/watchface.bin
+
+or 
+
+dotnet UnpackMiColorFace/bin/Debug/net10.0/UnpackMiColorFace.dll path/to/resource.bin
 ```
 
 The build restores Magick.NET from NuGet. `XiaomiWatch.Common.dll` is referenced from the repository's `lib` directory and copied to the build output.
